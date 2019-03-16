@@ -3,9 +3,11 @@ package io.github.thatkawaiisam.jedis.helper;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonParser;
+import lombok.Getter;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 
+@Getter
 public class JedisSubscriber extends JedisPubSub {
 
     private static final JsonParser JSON_PARSER = new JsonParser();
@@ -13,9 +15,12 @@ public class JedisSubscriber extends JedisPubSub {
     private JedisHelper helper;
     private Jedis jedis;
 
+    private String id;
+
     private IJedisSubscription subscription;
 
-    public JedisSubscriber(JedisHelper helper, IJedisSubscription subscription) {
+    public JedisSubscriber(String id, JedisHelper helper, IJedisSubscription subscription) {
+        this.id = id;
         this.helper = helper;
         this.subscription = subscription;
         this.jedis = new Jedis();
