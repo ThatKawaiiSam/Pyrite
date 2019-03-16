@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import lombok.Getter;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
+import redis.clients.jedis.JedisPubSub;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -22,17 +23,14 @@ public class JedisHelper {
 
         try (Jedis jedis = this.pool.getResource()) {
             attemptAuth(jedis);
-
             this.publisher = new JedisPublisher(this);
         }
     }
 
     public void close() {
-        for (JedisSubscriber subscriber : subscribers) {
-            if (subscriber.isSubscribed()) {
-                subscriber.unsubscribe();
-            }
-        }
+        subscribers.stream()
+                .filter(JedisPubSub::isSubscribed)
+                .forEach(JedisPubSub::unsubscribe);
         this.pool.close();
     }
 

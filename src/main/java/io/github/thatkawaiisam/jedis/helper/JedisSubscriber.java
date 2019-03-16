@@ -27,9 +27,7 @@ public class JedisSubscriber extends JedisPubSub {
 
         helper.attemptAuth(this.jedis);
 
-        new Thread(() -> {
-            this.jedis.subscribe(this, subscription.subscriptionChannels());
-        }).start();
+        new Thread(() -> this.jedis.subscribe(this, subscription.subscriptionChannels())).start();
     }
 
     public void cleanup() {

@@ -18,9 +18,8 @@ public class JedisPublisher {
 
         helper.runCommand(redis -> {
             helper.attemptAuth(redis);
-
             redis.publish(channelID, payload.toString());
-            return null;
+            return redis;
         });
 
     }
