@@ -18,6 +18,7 @@ public class JedisSubscriber extends JedisPubSub {
     private String id;
 
     private IJedisSubscription subscription;
+    private Thread subscriptionThread;
 
     public JedisSubscriber(String id, JedisHelper helper, IJedisSubscription subscription) {
         this.id = id;
@@ -27,10 +28,14 @@ public class JedisSubscriber extends JedisPubSub {
 
         helper.attemptAuth(this.jedis);
 
-        new Thread(() -> this.jedis.subscribe(this, subscription.subscriptionChannels())).start();
+        subscriptionThread = new Thread(() -> this.jedis.subscribe(this, subscription.subscriptionChannels()));
+        subscriptionThread.start();
     }
 
     public void cleanup() {
+        if (subscriptionThread != null && subscriptionThread.isAlive()) {
+            subscriptionThread.stop();
+        }
         this.unsubscribe();
     }
 

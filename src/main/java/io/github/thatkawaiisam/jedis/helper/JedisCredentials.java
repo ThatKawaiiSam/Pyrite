@@ -11,6 +11,10 @@ public class JedisCredentials {
     private final String address, password;
     private final int port;
 
+    /**
+     *
+     * @return
+     */
     public boolean isAuth() {
         return password != null && !password.isEmpty();
     }

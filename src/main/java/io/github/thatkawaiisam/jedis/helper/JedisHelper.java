@@ -31,7 +31,9 @@ public class JedisHelper {
         subscribers.stream()
                 .filter(JedisPubSub::isSubscribed)
                 .forEach(JedisPubSub::unsubscribe);
-        this.pool.close();
+        if (!this.pool.isClosed()) {
+            this.pool.close();
+        }
     }
 
     public boolean isActive() {
@@ -40,7 +42,7 @@ public class JedisHelper {
 
     public void attemptAuth(Jedis jedis) {
         if (this.credentials.isAuth()) {
-            jedis.auth(this.credentials.getPassword());
+            jedis.auth(this.credentials.getPassword()); // TODO: Check this status code, and potentially block responses to avoid code errors.
         }
     }
 

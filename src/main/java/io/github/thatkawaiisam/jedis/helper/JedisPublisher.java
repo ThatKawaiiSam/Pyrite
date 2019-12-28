@@ -21,6 +21,5 @@ public class JedisPublisher {
             redis.publish(channelID, payload.toString());
             return redis;
         });
-
     }
 }
