@@ -1,4 +1,4 @@
-package io.github.thatkawaiisam.jedis.helper;
+package io.github.thatkawaiisam.jedishelper;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
@@ -17,10 +17,17 @@ public class JedisSubscriber extends JedisPubSub {
 
     private String id;
 
-    private IJedisSubscription subscription;
+    private JedisSubscription subscription;
     private Thread subscriptionThread;
 
-    public JedisSubscriber(String id, JedisHelper helper, IJedisSubscription subscription) {
+    /**
+     * Jedis Subscriber.
+     *
+     * @param id of this subscriber object.
+     * @param helper instance.
+     * @param subscription interface that is being
+     */
+    public JedisSubscriber(String id, JedisHelper helper, JedisSubscription subscription) {
         this.id = id;
         this.helper = helper;
         this.subscription = subscription;
@@ -32,11 +39,16 @@ public class JedisSubscriber extends JedisPubSub {
         subscriptionThread.start();
     }
 
+    /**
+     * Cleanup this subscriber instance.
+     */
     public void cleanup() {
         if (subscriptionThread != null && subscriptionThread.isAlive()) {
             subscriptionThread.stop();
         }
-        this.unsubscribe();
+        if (isSubscribed()) {
+            this.unsubscribe();
+        }
     }
 
     @Override
@@ -47,8 +59,8 @@ public class JedisSubscriber extends JedisPubSub {
             JsonObject data = object.get("data").getAsJsonObject();
             this.subscription.handleMessage(payload, data);
         } catch (JsonParseException e) {
-            //TODO better debug
-            System.out.println("Received message that could not be parsed");
+            System.out.println("Received message that could not be parsed. (Channel: " + channel + ")");
+            e.printStackTrace();
         }
     }
 }

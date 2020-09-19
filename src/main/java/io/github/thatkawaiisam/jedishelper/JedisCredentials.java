@@ -1,4 +1,4 @@
-package io.github.thatkawaiisam.jedis.helper;
+package io.github.thatkawaiisam.jedishelper;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -12,8 +12,9 @@ public class JedisCredentials {
     private final int port;
 
     /**
+     * Check credential authentication.
      *
-     * @return
+     * @return whether current credentials have authentication.
      */
     public boolean isAuth() {
         return password != null && !password.isEmpty();

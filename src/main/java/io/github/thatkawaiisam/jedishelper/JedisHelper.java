@@ -1,10 +1,10 @@
-package io.github.thatkawaiisam.jedis.helper;
+package io.github.thatkawaiisam.jedishelper;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import lombok.Getter;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPubSub;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -17,6 +17,13 @@ public class JedisHelper {
     private JedisPublisher publisher;
     private Set<JedisSubscriber> subscribers = new HashSet<>();
 
+    private Gson gson = new Gson();
+
+    /**
+     * Jedis Helper.
+     *
+     * @param credentials for Jedis instance.
+     */
     public JedisHelper(JedisCredentials credentials) {
         this.credentials = credentials;
         this.pool = new JedisPool(this.getCredentials().getAddress(), this.credentials.getPort());
@@ -27,40 +34,68 @@ public class JedisHelper {
         }
     }
 
+    /**
+     * Close helper instance.
+     */
     public void close() {
-        subscribers.stream()
-                .filter(JedisPubSub::isSubscribed)
-                .forEach(JedisPubSub::unsubscribe);
+        subscribers.forEach(JedisSubscriber::cleanup);
         if (!this.pool.isClosed()) {
             this.pool.close();
         }
     }
 
+    /**
+     * Check whether the connection to the pool is currently active or closed.
+     *
+     * @return whether connection is active or not.
+     */
     public boolean isActive() {
         return this.pool != null && !this.pool.isClosed();
     }
 
+    /**
+     * Attempt to authenticate Jedis instance (if needed) from current credentials.
+     *
+     * @param jedis instance.
+     */
     public void attemptAuth(Jedis jedis) {
         if (this.credentials.isAuth()) {
-            jedis.auth(this.credentials.getPassword()); // TODO: Check this status code, and potentially block responses to avoid code errors.
+            jedis.auth(this.credentials.getPassword());
         }
     }
 
-    public void write(Enum payloadID, JsonObject data, String channel) {
+    /**
+     * Write message to Jedis pub sub.
+     *
+     * @param id of payload.
+     * @param data to be sent in the form of JSON.
+     * @param channel to be sent to.
+     */
+    public void write(Enum id, JsonObject data, String channel) {
         JsonObject object = new JsonObject();
 
-        object.addProperty("payload", payloadID.name());
+        object.addProperty("payload", id.name());
         object.add("data", data == null ? new JsonObject() : data);
 
-        publisher.write(channel, object);
+        try {
+            publisher.write(channel, object);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
-    public <T> T runCommand(IRedisCommand<T> redisCommand) {
+    /**
+     * Run Redis Command.
+     *
+     * @param command to be run.
+     * @return redis resource to push back to the pool.
+     */
+    public <T> T runCommand(RedisCommand<T> command) {
         Jedis jedis = this.pool.getResource();
         T result = null;
 
         try {
-            result = redisCommand.execute(jedis);
+            result = command.execute(jedis);
         } catch (Exception e) {
             e.printStackTrace();
 
