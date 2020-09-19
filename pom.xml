@@ -74,5 +74,13 @@
             </plugin>
         </plugins>
     </build>
+         
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>GitHub ThatKawaiiSam Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/ThatKawaiiSam/Jedis-Helper</url>
+        </repository>
+    </distributionManagement>
 
 </project>
