@@ -95,6 +95,7 @@ public class JedisHelper {
         T result = null;
 
         try {
+            attemptAuth(jedis);
             result = command.execute(jedis);
         } catch (Exception e) {
             e.printStackTrace();
