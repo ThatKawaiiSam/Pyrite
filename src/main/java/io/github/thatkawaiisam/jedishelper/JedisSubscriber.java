@@ -27,7 +27,7 @@ public class JedisSubscriber extends JedisPubSub {
      * @param helper instance.
      * @param subscription interface that is being
      */
-    public JedisSubscriber(String id, JedisHelper helper, JedisSubscription subscription) {
+    public JedisSubscriber(String id, JedisHelper helper, JedisSubscription subscription, boolean async) {
         this.id = id;
         this.helper = helper;
         this.subscription = subscription;
@@ -35,8 +35,12 @@ public class JedisSubscriber extends JedisPubSub {
 
         helper.attemptAuth(this.jedis);
 
-        subscriptionThread = new Thread(() -> this.jedis.subscribe(this, subscription.subscriptionChannels()));
-        subscriptionThread.start();
+        if (async) {
+            subscriptionThread = new Thread(() -> this.jedis.subscribe(this, subscription.subscriptionChannels()));
+            subscriptionThread.start();
+        } else {
+            this.jedis.subscribe(this, subscription.subscriptionChannels());
+        }
     }
 
     /**
@@ -45,6 +49,7 @@ public class JedisSubscriber extends JedisPubSub {
     public void cleanup() {
         if (subscriptionThread != null && subscriptionThread.isAlive()) {
             subscriptionThread.stop();
+            subscriptionThread = null;
         }
         if (isSubscribed()) {
             this.unsubscribe();
