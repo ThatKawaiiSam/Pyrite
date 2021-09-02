@@ -1,6 +1,49 @@
 # Pyrite
 > Jedis Packet Library.
 
+---
+
+#### Setup Pyrite + Send Packet
+```java
+// Setup
+Pyrite pyrite = new Pyrite(
+    new PyriteCredentials("localhost", "", 6379)
+);
+
+// Register Container
+pyrite.registerContainer(new ExamplePacketContainer());
+
+// Send Packet
+pyrite.sendPacket(new ExamplePacket(), "Channel");
+```
+
+#### Example Packet
+```java
+public class ExamplePacket extends PyritePacket {
+
+    private int field1 = 1;
+    private String field2 = "Howdy there!";
+
+}
+```
+
+#### Example Packet Container
+```java
+import io.github.thatkawaiisam.pyrite.packet.PyritePacketContainer;
+import io.github.thatkawaiisam.pyrite.packet.PyritePacketListener;
+
+public class ExamplePacketContainer implements PyritePacketContainer {
+
+    @PyritePacketListener
+    public void onTestPacket(ExamplePacket packet) {
+        System.out.println("Packet Recieved!");
+        System.out.println("====================");
+        System.out.println("Field1: " + packet.getField1());
+        System.out.println("Field2: " + packet.getField2());
+    }
+
+}
+```
 
 ---
 
