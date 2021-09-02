@@ -7,6 +7,7 @@ public class PacketMetadata {
 
     private String className;
     private long timeSent = System.currentTimeMillis();
+    private long timeReceived = System.currentTimeMillis();
 
     public PacketMetadata(Packet packet) {
         this.className = packet.getClass().getName();

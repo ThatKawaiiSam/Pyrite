@@ -66,7 +66,7 @@ public class PyriteSubscription extends JedisPubSub {
 
                 // Check Channel (no channels acts as a catch all).
                 if (method.getAnnotation(PacketListener.class).channels().length > 0 &&
-                        !Arrays.asList(method.getAnnotation(PacketListener.class).channels()).contains(channel)) {
+                        !Arrays.asList(method.getAnnotation(PacketListener.class).channels()).contains(channel.replace("Pyrite:", ""))) {
                     continue;
                 }
 
@@ -74,7 +74,13 @@ public class PyriteSubscription extends JedisPubSub {
                 try {
                     Object object = packetContainer.getClass().newInstance();
                     Class<?> type = method.getParameters()[0].getType();
-                    method.invoke(object, pyrite.getGson().fromJson(message, type));
+
+                    // Set Additional Metadata.
+                    Packet packet = (Packet) pyrite.getGson().fromJson(message, type);
+                    packet.getMetadata().setTimeReceived(System.currentTimeMillis());
+
+                    // Invoke.
+                    method.invoke(object, packet);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
