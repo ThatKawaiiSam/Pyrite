@@ -17,7 +17,7 @@ public class PyriteCredentials {
      * @return whether current credentials have authentication.
      */
     public boolean isAuth() {
-        return password != null && !password.isEmpty();
+        return this.password != null && !this.password.isEmpty();
     }
 
 }

@@ -1,9 +1,9 @@
 package io.github.thatkawaiisam.pyrite;
 
+import io.github.thatkawaiisam.pyrite.packet.PacketContainer;
 import lombok.Getter;
 import com.google.gson.Gson;
-import io.github.thatkawaiisam.pyrite.packet.PyritePacket;
-import io.github.thatkawaiisam.pyrite.packet.PyritePacketContainer;
+import io.github.thatkawaiisam.pyrite.packet.Packet;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 
@@ -19,7 +19,7 @@ public class Pyrite {
     private Gson gson = new Gson();
     private JedisPool pool;
 
-    private List<PyritePacketContainer> containers = new ArrayList<>();
+    private List<PacketContainer> containers = new ArrayList<>();
 
     /**
      * Pyrite.
@@ -37,7 +37,7 @@ public class Pyrite {
      *
      * @param packetContainer to register.
      */
-    public void registerContainer(PyritePacketContainer packetContainer) {
+    public void registerContainer(PacketContainer packetContainer) {
         this.containers.add(packetContainer);
     }
 
@@ -46,7 +46,7 @@ public class Pyrite {
      *
      * @param packetContainer to unregister.
      */
-    public void unregisterContainer(PyritePacketContainer packetContainer) {
+    public void unregisterContainer(PacketContainer packetContainer) {
         this.containers.remove(packetContainer);
     }
 
@@ -61,7 +61,7 @@ public class Pyrite {
         T result = null;
 
         try {
-            attemptAuth(jedis);
+            this.attemptAuth(jedis);
             result = command.execute(jedis);
         } catch (Exception e) {
             e.printStackTrace();
@@ -120,8 +120,9 @@ public class Pyrite {
      *
      * @param packet to send.
      */
-    public void sendPacket(PyritePacket packet, String channel) {
-        if (!isActive()) {
+    public void sendPacket(Packet packet, String channel) {
+        // Check if pool is active.
+        if (!this.isActive()) {
             try {
                 throw new Exception("Unable to send packets while pool is inactive.");
             } catch (Exception e) {
@@ -129,9 +130,13 @@ public class Pyrite {
             }
         }
 
-        runRedisCommand(redis -> {
-            attemptAuth(redis);
-            redis.publish("Pyrite:" + channel, gson.toJson(packet));
+        // Set TOF Metadata.
+        packet.getMetadata().setTimeSent(System.currentTimeMillis());
+
+        // Run Redis Command.
+        this.runRedisCommand(redis -> {
+            this.attemptAuth(redis);
+            redis.publish("Pyrite:" + channel, this.gson.toJson(packet));
             return redis;
         });
     }

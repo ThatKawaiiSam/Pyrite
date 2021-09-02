@@ -19,7 +19,7 @@ pyrite.sendPacket(new ExamplePacket(), "Channel");
 
 #### Example Packet
 ```java
-public class ExamplePacket extends PyritePacket {
+public class ExamplePacket extends Packet {
 
     private int field1 = 1;
     private String field2 = "Howdy there!";
@@ -29,12 +29,12 @@ public class ExamplePacket extends PyritePacket {
 
 #### Example Packet Container
 ```java
-import io.github.thatkawaiisam.pyrite.packet.PyritePacketContainer;
-import io.github.thatkawaiisam.pyrite.packet.PyritePacketListener;
+import io.github.thatkawaiisam.pyrite.packet.PacketContainer;
+import io.github.thatkawaiisam.pyrite.packet.PacketListener;
 
-public class ExamplePacketContainer implements PyritePacketContainer {
+public class ExamplePacketContainer implements PacketContainer {
 
-    @PyritePacketListener
+    @PacketListener
     public void onTestPacket(ExamplePacket packet) {
         System.out.println("Packet Recieved!");
         System.out.println("====================");
