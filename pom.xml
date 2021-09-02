@@ -93,7 +93,7 @@
         <repository>
             <id>github</id>
             <name>GitHub ThatKawaiiSam Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/ThatKawaiiSam/Jedis-Helper</url>
+            <url>https://maven.pkg.github.com/ThatKawaiiSam/Pyrite</url>
         </repository>
     </distributionManagement>
 
