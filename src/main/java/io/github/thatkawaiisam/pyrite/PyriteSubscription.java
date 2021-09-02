@@ -7,6 +7,7 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 public class PyriteSubscription extends JedisPubSub {
 
@@ -39,10 +40,12 @@ public class PyriteSubscription extends JedisPubSub {
             subscriptionThread.stop();
             subscriptionThread = null;
         }
+
         // Unsubscribe from channels.
         if (isSubscribed()) {
             this.unsubscribe();
         }
+        
         // Return resource to pool if still available.
         if (this.pyrite.getPool() != null && !this.pyrite.getPool().isClosed()) {
             this.pyrite.getPool().returnResource(subscriptionResource);
@@ -58,6 +61,12 @@ public class PyriteSubscription extends JedisPubSub {
                 if (!method.isAnnotationPresent(PyritePacketListener.class)
                         || method.getParameters().length != 1
                         || !PyritePacket.class.isAssignableFrom(method.getParameters()[0].getType())) {
+                    continue;
+                }
+
+                // Check Channel (no channels acts as a catch all).
+                if (method.getAnnotation(PyritePacketListener.class).channels().length > 0 &&
+                        !Arrays.asList(method.getAnnotation(PyritePacketListener.class).channels()).contains(channel)) {
                     continue;
                 }
 
