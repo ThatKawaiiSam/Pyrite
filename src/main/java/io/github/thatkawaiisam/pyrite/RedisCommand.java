@@ -1,4 +1,4 @@
-package io.github.thatkawaiisam.jedishelper;
+package io.github.thatkawaiisam.pyrite;
 
 import redis.clients.jedis.Jedis;
 

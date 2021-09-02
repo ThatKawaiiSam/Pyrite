@@ -1,4 +1,4 @@
-package io.github.thatkawaiisam.jedishelper;
+package io.github.thatkawaiisam.pyrite;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -6,7 +6,7 @@ import lombok.Setter;
 
 @AllArgsConstructor
 @Getter @Setter
-public class JedisCredentials {
+public class PyriteCredentials {
 
     private final String address, password;
     private final int port;
