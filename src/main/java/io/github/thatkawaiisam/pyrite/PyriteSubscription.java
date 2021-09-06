@@ -77,7 +77,7 @@ public class PyriteSubscription extends JedisPubSub {
 
                     // Check Packet Class Name.
                     Packet packet = (Packet) pyrite.getGson().fromJson(message, type);
-                    if (!method.getParameters()[0].getClass().getName().equalsIgnoreCase(packet.getMetadata().getClassName())) {
+                    if (!type.getName().equalsIgnoreCase(packet.getMetadata().getClassName())) {
                         continue;
                     }
 
