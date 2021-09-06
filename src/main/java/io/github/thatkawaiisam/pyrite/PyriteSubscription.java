@@ -72,7 +72,7 @@ public class PyriteSubscription extends JedisPubSub {
 
                 // Invoke method with transformed data class.
                 try {
-                    Object object = packetContainer.getClass().newInstance();
+                    Object object = packetContainer;
                     Class<?> type = method.getParameters()[0].getType();
 
                     // Set Additional Metadata.
