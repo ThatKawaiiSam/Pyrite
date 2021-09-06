@@ -75,11 +75,14 @@ public class PyriteSubscription extends JedisPubSub {
                     Object object = packetContainer;
                     Class<?> type = method.getParameters()[0].getType();
 
-                    // Set Additional Metadata.
+                    // Check Packet Class Name.
                     Packet packet = (Packet) pyrite.getGson().fromJson(message, type);
-                    packet.getMetadata().setTimeReceived(System.currentTimeMillis());
+                    if (!method.getParameters()[0].getClass().getName().equalsIgnoreCase(packet.getMetadata().getClassName())) {
+                        continue;
+                    }
 
-                    // Invoke.
+                    // Set Additional Metadata & Invoke.
+                    packet.getMetadata().setTimeReceived(System.currentTimeMillis());
                     method.invoke(object, packet);
                 } catch (Exception e) {
                     e.printStackTrace();
